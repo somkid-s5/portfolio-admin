@@ -1,17 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
+import { AuthSessionBridge } from "@/components/auth-session-bridge";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: {
@@ -19,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s | Admin Panel",
   },
   description:
-    "A modern content management system for managing your portfolio projects, certifications, and documentation.",
+    "A modern admin panel for managing your portfolio projects and certifications.",
   keywords: ["portfolio", "admin", "cms", "projects", "certifications"],
   authors: [{ name: "Smart" }],
   robots: {
@@ -44,9 +34,8 @@ export default function RootLayout({
           href="https://vmhlmcwsylkpxzkjmjix.supabase.co"
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="antialiased">
+        <AuthSessionBridge />
         {children}
         <Toaster richColors position="top-right" closeButton />
       </body>

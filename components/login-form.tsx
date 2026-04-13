@@ -18,6 +18,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { syncAdminSessionCookie } from "@/lib/adminSessionCookie";
 
 // เปลี่ยนจาก 'export function LoginForm' เป็น 'export const LoginForm'
 // และใช้ Arrow Function Syntax
@@ -36,7 +37,7 @@ export const LoginForm = ({
     setError(null);
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -48,8 +49,12 @@ export const LoginForm = ({
       return;
     }
 
-    // ถ้า login ผ่าน ก็เด้งไปหน้า dashboard (เราจะสร้างภายหลัง)
-    router.push("/admin/dashboard");
+    await syncAdminSessionCookie(
+      data.session?.access_token ?? null,
+      data.session?.expires_at
+    );
+
+    router.replace("/admin/dashboard");
   };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -74,8 +79,10 @@ export const LoginForm = ({
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="name@work-email.com"
+                  autoComplete="email"
                   required
                   className="h-12"
                   value={email}
@@ -89,7 +96,9 @@ export const LoginForm = ({
                 <Input
                   className="h-12"
                   id="password"
+                  name="password"
                   type="password"
+                  autoComplete="current-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

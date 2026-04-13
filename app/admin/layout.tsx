@@ -6,13 +6,13 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   FolderGit2,
-  FileText,
   Award,
   LogOut,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/lib/supabaseClient";
+import { syncAdminSessionCookie } from "@/lib/adminSessionCookie";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -32,11 +32,6 @@ const navItems = [
     icon: FolderGit2,
   },
   {
-    href: "/admin/docs",
-    label: "Docs",
-    icon: FileText,
-  },
-  {
     href: "/admin/certifications",
     label: "Certifications",
     icon: Award,
@@ -54,18 +49,29 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         const { data, error } = await supabase.auth.getUser();
 
         if (error) {
+          await syncAdminSessionCookie(null);
           toast.error("Session check failed, please sign in again.");
           router.replace("/login");
           return;
         }
 
         if (!data.user) {
+          await syncAdminSessionCookie(null);
           router.replace("/login");
           return;
         }
 
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        await syncAdminSessionCookie(
+          session?.access_token ?? null,
+          session?.expires_at
+        );
+
         setChecking(false);
       } catch (err) {
+        await syncAdminSessionCookie(null);
         const message =
           err instanceof Error ? err.message : "Unable to verify session";
         toast.error(message);
@@ -80,6 +86,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    await syncAdminSessionCookie(null);
     router.replace("/login");
   };
 

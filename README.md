@@ -16,7 +16,7 @@
 
 ## 🚀 Overview
 
-**Portfolio Admin Panel** is a robust and modern content management system (CMS) designed to manage the data for your personal portfolio website. Built with performance and user experience in mind, it allows you to easily add, edit, and organize your projects, certifications, and other portfolio assets through a sleek, responsive interface.
+**Portfolio Admin Panel** is a modern content management system (CMS) for maintaining your portfolio ecosystem. It gives you one place to manage projects and certifications that power the public portfolio site.
 
 > **"Manage your professional journey with style and efficiency."**
 
@@ -24,9 +24,9 @@
 
 ## ✨ Key Features
 
-- **🔐 Secure Authentication**: Powered by Supabase Auth for robust and secure login access.
+- **🔐 Secure Authentication**: Powered by Supabase Auth for secure login access.
 - **📂 Project Management**: CRUD operations for portfolio projects with rich details, images, and links.
-- **🏆 Certification Tracking**: Manage your professional certifications, including exams, training, and badges.
+- **🏆 Certification Tracking**: Manage your professional certifications, including exams, training, and badge images.
 - **🎨 Modern UI/UX**: A beautiful, dark-themed interface built with **Tailwind CSS** and **Shadcn UI**.
 - **📱 Fully Responsive**: Optimized for seamless usage across desktop, tablet, and mobile devices.
 - **⚡ Real-time Updates**: Instant data reflection using Supabase's real-time capabilities.
@@ -42,7 +42,7 @@ This project leverages the latest web technologies to ensure scalability and mai
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
 - **Components**: [Shadcn UI](https://ui.shadcn.com/) / [Lucide React](https://lucide.dev/)
-- **Rich Text Editor**: [Tiptap](https://tiptap.dev/)
+- **Rich Content Editor**: [Tiptap](https://tiptap.dev/) for project content editing
 - **Backend & Database**: [Supabase](https://supabase.com/)
 - **State Management**: React Hooks & Context
 - **Form Handling**: Controlled Components
@@ -64,8 +64,8 @@ Follow these steps to set up the project locally on your machine.
 1.  **Clone the repository**
 
     ```bash
-    git clone https://github.com/your-username/portfolio-admin-panel.git
-    cd portfolio-admin-panel
+    git clone https://github.com/somkid-s5/portfolio-admin.git
+    cd portfolio-admin
     ```
 
 2.  **Install dependencies**
@@ -118,16 +118,6 @@ A quick look at the top-level files and directories you'll see in this project.
 
 ---
 
-## 📸 Screenshots
-
-|                                Dashboard                                 |                            Edit Certification                            |
-| :----------------------------------------------------------------------: | :----------------------------------------------------------------------: |
-| ![Dashboard](https://via.placeholder.com/600x300?text=Dashboard+Preview) | ![Edit Page](https://via.placeholder.com/600x300?text=Edit+Page+Preview) |
-
-> _Replace these placeholders with actual screenshots of your application to showcase its design._
-
----
-
 ## 🤝 Contributing
 
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
@@ -148,13 +138,13 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 👤 Author
 
-**Batcat**
+**Smart Somkid Sodsai**
 
-- Website: [your-portfolio.com](https://your-portfolio.com)
-- GitHub: [@Batcat](https://github.com/Batcat)
+- Website: [smart-th.com](https://smart-th.com)
+- GitHub: [@somkid-s5](https://github.com/somkid-s5)
 
 ---
 
 <div align="center">
-  <sub>Built with ❤️ by Batcat</sub>
+  <sub>Built with ❤️ by Smart Somkid Sodsai</sub>
 </div>

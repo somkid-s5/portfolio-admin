@@ -210,6 +210,8 @@ export default function NewProjectPage() {
                 <Label htmlFor="title">Title</Label>
                 <Input
                   id="title"
+                  name="title"
+                  autoComplete="off"
                   placeholder="e.g. Aritmatika Solver"
                   required
                   value={title}
@@ -226,6 +228,8 @@ export default function NewProjectPage() {
                 <div className="flex gap-2">
                   <Input
                     id="slug"
+                    name="slug"
+                    autoComplete="off"
                     placeholder="aritmatika-solver"
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
@@ -251,6 +255,8 @@ export default function NewProjectPage() {
                 <Label htmlFor="category">Category (optional)</Label>
                 <Input
                   id="category"
+                  name="category"
+                  autoComplete="off"
                   placeholder="e.g. DevOps, Portfolio"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
@@ -260,12 +266,13 @@ export default function NewProjectPage() {
                 </p>
               </div>
               <div className="space-y-1.5">
-                <Label>Status</Label>
+                <Label htmlFor="project-status">Status</Label>
                 <Select
+                  name="status"
                   value={status}
                   onValueChange={(value) => setStatus(value as ProjectStatus)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="project-status" aria-label="Project status">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -283,6 +290,7 @@ export default function NewProjectPage() {
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
+                name="description"
                 placeholder="Main paragraph shown under the title…"
                 rows={4}
                 value={description}
@@ -296,6 +304,8 @@ export default function NewProjectPage() {
                 <Label htmlFor="techStack">Tech Stack</Label>
                 <Input
                   id="techStack"
+                  name="techStack"
+                  autoComplete="off"
                   placeholder="Python, FastAPI, Next.js"
                   value={techStack}
                   onChange={(e) => setTechStack(e.target.value)}
@@ -308,6 +318,7 @@ export default function NewProjectPage() {
                 <Label htmlFor="coverImage">Cover image</Label>
                 <Input
                   id="coverImage"
+                  name="coverImage"
                   type="file"
                   accept="image/*"
                   onChange={(e) => {
@@ -329,6 +340,8 @@ export default function NewProjectPage() {
                 <Label htmlFor="demoUrl">Live demo URL</Label>
                 <Input
                   id="demoUrl"
+                  name="demoUrl"
+                  autoComplete="url"
                   placeholder="https://your-demo-url.com"
                   value={demoUrl}
                   onChange={(e) => setDemoUrl(e.target.value)}
@@ -338,6 +351,8 @@ export default function NewProjectPage() {
                 <Label htmlFor="githubUrl">GitHub URL</Label>
                 <Input
                   id="githubUrl"
+                  name="githubUrl"
+                  autoComplete="url"
                   placeholder="https://github.com/your/repo"
                   value={githubUrl}
                   onChange={(e) => setGithubUrl(e.target.value)}
@@ -347,13 +362,16 @@ export default function NewProjectPage() {
 
             {/* Key Features */}
             <div className="space-y-2">
-              <Label>Key Features</Label>
+              <Label htmlFor="featureInput">Key Features</Label>
               <p className="text-[11px] text-muted-foreground">
                 Short bullet points that will be shown in the right panel of the
                 project page.
               </p>
               <div className="flex gap-2">
                 <Input
+                  id="featureInput"
+                  name="featureInput"
+                  autoComplete="off"
                   placeholder="e.g. Solve arithmetic sequences automatically"
                   value={featureInput}
                   onChange={(e) => setFeatureInput(e.target.value)}
@@ -441,6 +459,7 @@ export default function NewProjectPage() {
                     src={URL.createObjectURL(coverFile)}
                     alt="Cover preview"
                     fill
+                    sizes="(max-width: 768px) 100vw, 448px"
                     className="object-cover"
                   />
                 ) : coverImageUrl ? (
@@ -448,6 +467,7 @@ export default function NewProjectPage() {
                     src={coverImageUrl}
                     alt="Cover preview"
                     fill
+                    sizes="(max-width: 768px) 100vw, 448px"
                     className="object-cover"
                   />
                 ) : (

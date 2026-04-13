@@ -265,7 +265,7 @@ export default function EditCertificationPage() {
             Edit certification
           </h1>
           <p className="text-sm text-muted-foreground">
-            Update details, status, and badge image for this certification.
+            Update details, status, and badge image for this certification record.
           </p>
         </div>
         <Button
@@ -300,12 +300,13 @@ export default function EditCertificationPage() {
             {/* Type + Status */}
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>Type</Label>
+                <Label htmlFor="edit-cert-type">Type</Label>
                 <Select
+                  name="certType"
                   value={certType}
                   onValueChange={(val) => setCertType(val as CertType)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="edit-cert-type" aria-label="Certification type">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -317,12 +318,13 @@ export default function EditCertificationPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label>Status</Label>
+                <Label htmlFor="edit-cert-status">Status</Label>
                 <Select
+                  name="status"
                   value={status}
                   onValueChange={(val) => setStatus(val as CertStatus)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="edit-cert-status" aria-label="Certification status">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -341,6 +343,8 @@ export default function EditCertificationPage() {
                 <Label htmlFor="name">Certification name</Label>
                 <Input
                   id="name"
+                  name="name"
+                  autoComplete="off"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -351,6 +355,8 @@ export default function EditCertificationPage() {
                 <Label htmlFor="vendor">Vendor / Organization</Label>
                 <Input
                   id="vendor"
+                  name="vendor"
+                  autoComplete="organization"
                   required
                   value={vendor}
                   onChange={(e) => setVendor(e.target.value)}
@@ -361,8 +367,9 @@ export default function EditCertificationPage() {
             {/* Category + Level */}
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>Category</Label>
+                <Label htmlFor="edit-cert-category">Category</Label>
                 <Select
+                  name="category"
                   value={isCustomCategory ? "_custom_" : category || "none"}
                   onValueChange={(val) => {
                     if (val === "_custom_") {
@@ -375,7 +382,7 @@ export default function EditCertificationPage() {
                     }
                   }}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="edit-cert-category" aria-label="Certification category">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -395,6 +402,8 @@ export default function EditCertificationPage() {
                 </Select>
                 {isCustomCategory && (
                   <Input
+                    id="edit-cert-custom-category"
+                    name="customCategory"
                     className="mt-2 h-8 text-xs"
                     placeholder="Enter new category name..."
                     value={category}
@@ -408,6 +417,8 @@ export default function EditCertificationPage() {
                 <Label htmlFor="level">Level (optional)</Label>
                 <Input
                   id="level"
+                  name="level"
+                  autoComplete="off"
                   value={level}
                   onChange={(e) => setLevel(e.target.value)}
                 />
@@ -420,6 +431,7 @@ export default function EditCertificationPage() {
                 <Label htmlFor="issue">Issue date</Label>
                 <Input
                   id="issue"
+                  name="issueDate"
                   type="date"
                   value={issueDate}
                   onChange={(e) => setIssueDate(e.target.value)}
@@ -430,6 +442,7 @@ export default function EditCertificationPage() {
                 <Label htmlFor="expiry">Expiry date (optional)</Label>
                 <Input
                   id="expiry"
+                  name="expiryDate"
                   type="date"
                   value={expiryDate}
                   onChange={(e) => setExpiryDate(e.target.value)}
@@ -443,6 +456,8 @@ export default function EditCertificationPage() {
                 <Label htmlFor="credId">Credential ID (optional)</Label>
                 <Input
                   id="credId"
+                  name="credentialId"
+                  autoComplete="off"
                   value={credentialId}
                   onChange={(e) => setCredentialId(e.target.value)}
                 />
@@ -452,6 +467,8 @@ export default function EditCertificationPage() {
                 <Label htmlFor="credUrl">Credential URL (optional)</Label>
                 <Input
                   id="credUrl"
+                  name="credentialUrl"
+                  autoComplete="url"
                   value={credentialUrl}
                   onChange={(e) => setCredentialUrl(e.target.value)}
                 />
@@ -464,6 +481,8 @@ export default function EditCertificationPage() {
                 <Label htmlFor="score">Score (optional)</Label>
                 <Input
                   id="score"
+                  name="score"
+                  autoComplete="off"
                   type="number"
                   min={0}
                   max={1000}
@@ -474,19 +493,20 @@ export default function EditCertificationPage() {
 
               <div className="flex items-center justify-between space-y-0 rounded-md border border-border/60 px-3 py-2.5">
                 <div className="space-y-0.5">
-                  <Label>Highlight in portfolio</Label>
+                  <Label htmlFor="edit-cert-highlight">Highlight in portfolio</Label>
                   <p className="text-[11px] text-muted-foreground">
-                    Mark this as a key certification to show in your public
-                    profile later.
+                    Mark this as a key certification to show in your
+                    public-facing
+                    portfolio later.
                   </p>
                 </div>
-                <Switch checked={highlight} onCheckedChange={setHighlight} />
+                <Switch id="edit-cert-highlight" checked={highlight} onCheckedChange={setHighlight} />
               </div>
             </div>
 
             {/* Badge image */}
             <div className="space-y-1.5">
-              <Label>Badge image</Label>
+              <Label htmlFor="edit-cert-badge-image">Badge image</Label>
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-md border border-dashed border-border/60 flex items-center justify-center overflow-hidden bg-muted/30">
                   {badgePreview ? (
@@ -495,6 +515,7 @@ export default function EditCertificationPage() {
                         src={badgePreview}
                         alt="Badge preview"
                         fill
+                        sizes="64px"
                         className="object-cover"
                       />
                     </div>
@@ -504,6 +525,7 @@ export default function EditCertificationPage() {
                         src={currentBadgeUrl}
                         alt="Current badge"
                         fill
+                        sizes="64px"
                         className="object-cover"
                       />
                     </div>
@@ -516,6 +538,8 @@ export default function EditCertificationPage() {
 
                 <div className="flex flex-col gap-2">
                   <Input
+                    id="edit-cert-badge-image"
+                    name="badgeImage"
                     type="file"
                     accept="image/*"
                     className="h-8"
@@ -540,6 +564,7 @@ export default function EditCertificationPage() {
                   />
                   <div className="flex items-center gap-2">
                     <Switch
+                      id="edit-cert-clear-badge"
                       checked={clearBadge}
                       onCheckedChange={(val) => {
                         setClearBadge(val);
@@ -549,9 +574,9 @@ export default function EditCertificationPage() {
                         }
                       }}
                     />
-                    <span className="text-[11px] text-muted-foreground">
+                    <Label htmlFor="edit-cert-clear-badge" className="text-[11px] text-muted-foreground">
                       Remove existing badge image
-                    </span>
+                    </Label>
                   </div>
                   <p className="text-[11px] text-muted-foreground">
                     If you upload a new image, it will replace the existing one.
@@ -564,9 +589,10 @@ export default function EditCertificationPage() {
             {/* Notes */}
             <div className="space-y-1.5">
               <Label htmlFor="notes">Notes (optional)</Label>
-              <Textarea
-                id="notes"
-                rows={3}
+                <Textarea
+                  id="notes"
+                  name="notes"
+                  rows={3}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
               />

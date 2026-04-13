@@ -262,7 +262,7 @@ export default function ProjectsPage() {
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
             <p className="text-sm text-muted-foreground">
-              Manage and track your DevOps, system, and documentation projects.
+            Manage and track your DevOps, system, and portfolio projects.
             </p>
           </div>
           <div className="shrink-0">
@@ -317,7 +317,11 @@ export default function ProjectsPage() {
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
+                id="projects-search"
+                name="projects-search"
                 placeholder="Search projects..."
+                aria-label="Search projects"
+                autoComplete="off"
                 className="h-9 w-full md:w-[150px] lg:w-[250px] pl-9 text-xs"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}

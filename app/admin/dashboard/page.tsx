@@ -8,11 +8,10 @@ import { supabase } from "@/lib/supabaseClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { FileText, FolderGit2, Award, ArrowRight, Circle } from "lucide-react";
+import { FolderGit2, Award, ArrowRight, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ProjectStatus = "draft" | "in_progress" | "done" | "archived" | string;
-type DocStatus = "draft" | "published" | string;
 type CertStatus = "planned" | "in_progress" | "passed" | "expired" | string;
 
 type ProjectRow = {
@@ -21,21 +20,6 @@ type ProjectRow = {
   status: ProjectStatus;
   updated_at: string;
   created_at: string;
-};
-
-type DocPageRow = {
-  id: string;
-  title: string;
-  status: DocStatus;
-  section_id: string | null;
-  updated_at: string;
-  created_at: string;
-};
-
-type DocSectionRow = {
-  id: string;
-  name: string;
-  slug: string;
 };
 
 type CertRow = {
@@ -49,21 +33,12 @@ type CertRow = {
 
 type DashboardStats = {
   totalProjects: number;
-  totalDocsPublished: number;
   totalCertsPassed: number;
-  totalDbDocsPublished: number;
 };
 
 type StatusCounts = Record<string, number>;
 
-type SectionCoverage = {
-  sectionId: string;
-  name: string;
-  slug: string;
-  publishedCount: number;
-};
-
-type ActivityItemType = "project" | "doc" | "cert";
+type ActivityItemType = "project" | "cert";
 
 type ActivityItem = {
   id: string;
@@ -85,16 +60,13 @@ function formatDateTime(value: string) {
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats>({
     totalProjects: 0,
-    totalDocsPublished: 0,
     totalCertsPassed: 0,
-    totalDbDocsPublished: 0,
   });
 
   const [projectStatusCounts, setProjectStatusCounts] = useState<StatusCounts>(
     {}
   );
   const [certStatusCounts, setCertStatusCounts] = useState<StatusCounts>({});
-  const [sectionCoverage, setSectionCoverage] = useState<SectionCoverage[]>([]);
   const [activities, setActivities] = useState<ActivityItem[]>([]);
 
   const [loading, setLoading] = useState(true);
@@ -106,106 +78,46 @@ export default function DashboardPage() {
       setError(null);
 
       try {
-        // ดึงข้อมูลชุดเล็กพอสำหรับ dashboard ทั้งหน้า
-        const [projectsRes, docsRes, sectionsRes, certsRes] = await Promise.all(
-          [
-            supabase
-              .from("projects")
-              .select("id, title, status, updated_at, created_at")
-              .order("updated_at", { ascending: false }),
-            supabase
-              .from("doc_pages")
-              .select("id, title, status, section_id, updated_at, created_at")
-              .order("updated_at", { ascending: false }),
-            supabase
-              .from("doc_sections")
-              .select("id, name, slug")
-              .order("sort_order", { ascending: true }),
-            supabase
-              .from("certs")
-              .select("id, name, vendor, status, updated_at, created_at")
-              .order("updated_at", { ascending: false }),
-          ]
-        );
+        const [projectsRes, certsRes] = await Promise.all([
+          supabase
+            .from("projects")
+            .select("id, title, status, updated_at, created_at")
+            .order("updated_at", { ascending: false }),
+          supabase
+            .from("certs")
+            .select("id, name, vendor, status, updated_at, created_at")
+            .order("updated_at", { ascending: false }),
+        ]);
 
         if (projectsRes.error) throw projectsRes.error;
-        if (docsRes.error) throw docsRes.error;
-        if (sectionsRes.error) throw sectionsRes.error;
         if (certsRes.error) throw certsRes.error;
 
         const projects = (projectsRes.data ?? []) as ProjectRow[];
-        const docs = (docsRes.data ?? []) as DocPageRow[];
-        const sections = (sectionsRes.data ?? []) as DocSectionRow[];
         const certs = (certsRes.data ?? []) as CertRow[];
 
-        // ---------- Stats ----------
-        const totalProjects = projects.length;
-        const docsPublished = docs.filter(
-          (d) => d.status === "published"
-        ).length;
-        const certsPassed = certs.filter((c) => c.status === "passed").length;
-
-        const dbSection = sections.find((s) => s.slug === "database");
-        let dbDocsPublished = 0;
-        if (dbSection) {
-          dbDocsPublished = docs.filter(
-            (d) => d.section_id === dbSection.id && d.status === "published"
-          ).length;
-        }
-
         setStats({
-          totalProjects,
-          totalDocsPublished: docsPublished,
-          totalCertsPassed: certsPassed,
-          totalDbDocsPublished: dbDocsPublished,
+          totalProjects: projects.length,
+          totalCertsPassed: certs.filter((c) => c.status === "passed").length,
         });
 
-        // ---------- Project status breakdown ----------
         const projCounts: StatusCounts = {};
         for (const p of projects) {
           projCounts[p.status] = (projCounts[p.status] ?? 0) + 1;
         }
         setProjectStatusCounts(projCounts);
 
-        // ---------- Cert status breakdown ----------
         const certCounts: StatusCounts = {};
         for (const c of certs) {
           certCounts[c.status] = (certCounts[c.status] ?? 0) + 1;
         }
         setCertStatusCounts(certCounts);
 
-        // ---------- Docs coverage by section ----------
-        const coverage: SectionCoverage[] = sections.map((section) => {
-          const publishedCount = docs.filter(
-            (d) => d.section_id === section.id && d.status === "published"
-          ).length;
-
-          return {
-            sectionId: section.id,
-            name: section.name,
-            slug: section.slug,
-            publishedCount,
-          };
-        });
-        setSectionCoverage(coverage);
-
-        // ---------- Activity timeline ----------
-        const projActivities: ActivityItem[] = projects
-          .slice(0, 10)
-          .map((p) => ({
-            id: p.id,
-            type: "project",
-            title: p.title,
-            subtitle: `Project • ${p.status}`,
-            at: p.updated_at || p.created_at,
-          }));
-
-        const docActivities: ActivityItem[] = docs.slice(0, 10).map((d) => ({
-          id: d.id,
-          type: "doc",
-          title: d.title,
-          subtitle: `Doc • ${d.status}`,
-          at: d.updated_at || d.created_at,
+        const projActivities: ActivityItem[] = projects.slice(0, 10).map((p) => ({
+          id: p.id,
+          type: "project",
+          title: p.title,
+          subtitle: `Project • ${p.status}`,
+          at: p.updated_at || p.created_at,
         }));
 
         const certActivities: ActivityItem[] = certs.slice(0, 10).map((c) => ({
@@ -216,11 +128,11 @@ export default function DashboardPage() {
           at: c.updated_at || c.created_at,
         }));
 
-        const merged = [...projActivities, ...docActivities, ...certActivities]
-          .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
-          .slice(0, 12);
-
-        setActivities(merged);
+        setActivities(
+          [...projActivities, ...certActivities]
+            .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
+            .slice(0, 12)
+        );
       } catch (err: unknown) {
         console.error(err);
         setError((err as Error).message ?? "Failed to load dashboard.");
@@ -234,11 +146,10 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
-          Overview of your projects, docs, and certifications.
+          Overview of your projects and certifications.
         </p>
         {error && (
           <p className="text-xs text-destructive">
@@ -247,9 +158,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {/* Projects */}
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <Card className="bg-card/90 border border-border/60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
             <CardTitle className="text-xs font-medium text-muted-foreground">
@@ -259,7 +168,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-semibold">
-              {loading ? "…" : stats.totalProjects}
+              {loading ? "..." : stats.totalProjects}
             </div>
             <p className="text-xs text-muted-foreground">
               Total tracked projects
@@ -267,25 +176,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Docs */}
-        <Card className="bg-card/90 border border-border/60">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
-            <CardTitle className="text-xs font-medium text-muted-foreground">
-              Docs
-            </CardTitle>
-            <FileText className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-semibold">
-              {loading ? "…" : stats.totalDocsPublished}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Published knowledge articles
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Certifications (passed only) */}
         <Card className="bg-card/90 border border-border/60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
             <CardTitle className="text-xs font-medium text-muted-foreground">
@@ -295,15 +185,14 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-semibold">
-              {loading ? "…" : stats.totalCertsPassed}
+              {loading ? "..." : stats.totalCertsPassed}
             </div>
             <p className="text-xs text-muted-foreground">
-              Exams you&apos;ve already achieved
+              Exams you've already achieved
             </p>
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
         <div className="flex flex-col gap-2">
           <p className="text-sm font-medium">Quick actions</p>
           <div className="grid gap-2">
@@ -312,16 +201,6 @@ export default function DashboardPage() {
                 <span className="flex items-center gap-2">
                   <FolderGit2 className="h-3.5 w-3.5 text-primary" />
                   <span>New project</span>
-                </span>
-                <ArrowRight className="h-3 w-3 text-muted-foreground" />
-              </button>
-            </Link>
-
-            <Link href="/admin/docs/new">
-              <button className="w-full inline-flex items-center justify-between rounded-md border border-border/70 bg-background/60 px-3 py-2 text-xs hover:bg-background/90 transition">
-                <span className="flex items-center gap-2">
-                  <FileText className="h-3.5 w-3.5 text-primary" />
-                  <span>New doc page</span>
                 </span>
                 <ArrowRight className="h-3 w-3 text-muted-foreground" />
               </button>
@@ -340,9 +219,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Bottom grid: Activity + Side column */}
       <div className="grid gap-4 lg:grid-cols-3">
-        {/* Activity timeline (2 cols) */}
         <Card className="lg:col-span-2 bg-card/90 border border-border/60">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-medium">
@@ -356,11 +233,11 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="text-sm">
             {loading ? (
-              <p className="text-muted-foreground text-sm">Loading activity…</p>
+              <p className="text-muted-foreground text-sm">Loading activity...</p>
             ) : activities.length === 0 ? (
               <p className="text-muted-foreground text-sm">
-                No activity yet. Create a project, doc, or certification to see
-                the timeline here.
+                No activity yet. Create a project or certification to see the
+                timeline here.
               </p>
             ) : (
               <ul className="space-y-3">
@@ -371,7 +248,6 @@ export default function DashboardPage() {
                         className={cn(
                           "h-2.5 w-2.5",
                           item.type === "project" && "text-primary",
-                          item.type === "doc" && "text-blue-400",
                           item.type === "cert" && "text-amber-400"
                         )}
                         fill="currentColor"
@@ -397,9 +273,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Right column: Quick actions + overview */}
         <div className="space-y-4">
-          {/* Completion overview */}
           <Card className="bg-card/90 border border-border/60">
             <CardHeader>
               <CardTitle className="text-sm font-medium">
@@ -407,102 +281,68 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-xs">
-              {/* Project status */}
               <div className="space-y-1.5">
                 <p className="font-medium text-[11px] text-muted-foreground">
                   Projects status
                 </p>
                 <div className="flex flex-wrap gap-1.5">
-                  {["draft", "in_progress", "done", "archived"].map(
-                    (status) => {
-                      const count = projectStatusCounts[status] ?? 0;
-                      if (count === 0) return null;
-                      return (
-                        <Badge
-                          key={status}
-                          variant="outline"
-                          className="text-[10px] flex items-center gap-1"
-                        >
-                          <span
-                            className={cn(
-                              "h-1.5 w-1.5 rounded-full",
-                              status === "done" && "bg-emerald-400",
-                              status === "in_progress" && "bg-sky-400",
-                              status === "draft" && "bg-zinc-500",
-                              status === "archived" && "bg-zinc-700"
-                            )}
-                          />
-                          <span>{status}</span>
-                          <span className="opacity-70">· {count}</span>
-                        </Badge>
-                      );
-                    }
-                  )}
+                  {["draft", "in_progress", "done", "archived"].map((status) => {
+                    const count = projectStatusCounts[status] ?? 0;
+                    if (count === 0) return null;
+                    return (
+                      <Badge
+                        key={status}
+                        variant="outline"
+                        className="text-[10px] flex items-center gap-1"
+                      >
+                        <span
+                          className={cn(
+                            "h-1.5 w-1.5 rounded-full",
+                            status === "done" && "bg-emerald-400",
+                            status === "in_progress" && "bg-sky-400",
+                            status === "draft" && "bg-zinc-500",
+                            status === "archived" && "bg-zinc-700"
+                          )}
+                        />
+                        <span>{status}</span>
+                        <span className="opacity-70">· {count}</span>
+                      </Badge>
+                    );
+                  })}
                 </div>
               </div>
 
               <Separator className="bg-border/60" />
 
-              {/* Cert status */}
               <div className="space-y-1.5">
                 <p className="font-medium text-[11px] text-muted-foreground">
                   Certifications status
                 </p>
                 <div className="flex flex-wrap gap-1.5">
-                  {["planned", "in_progress", "passed", "expired"].map(
-                    (status) => {
-                      const count = certStatusCounts[status] ?? 0;
-                      if (count === 0) return null;
-                      return (
-                        <Badge
-                          key={status}
-                          variant="outline"
-                          className="text-[10px] flex items-center gap-1"
-                        >
-                          <span
-                            className={cn(
-                              "h-1.5 w-1.5 rounded-full",
-                              status === "passed" && "bg-emerald-400",
-                              status === "in_progress" && "bg-sky-400",
-                              status === "planned" && "bg-zinc-500",
-                              status === "expired" && "bg-red-500"
-                            )}
-                          />
-                          <span>{status}</span>
-                          <span className="opacity-70">· {count}</span>
-                        </Badge>
-                      );
-                    }
-                  )}
-                </div>
-              </div>
-
-              <Separator className="bg-border/60" />
-
-              {/* Docs coverage by section */}
-              <div className="space-y-1.5">
-                <p className="font-medium text-[11px] text-muted-foreground">
-                  Docs coverage by section
-                </p>
-                {sectionCoverage.length === 0 ? (
-                  <p className="text-[11px] text-muted-foreground">
-                    No doc sections defined yet.
-                  </p>
-                ) : (
-                  <div className="space-y-1">
-                    {sectionCoverage.map((s) => (
-                      <div
-                        key={s.sectionId}
-                        className="flex items-center justify-between text-[11px]"
+                  {["planned", "in_progress", "passed", "expired"].map((status) => {
+                    const count = certStatusCounts[status] ?? 0;
+                    if (count === 0) return null;
+                    return (
+                      <Badge
+                        key={status}
+                        variant="outline"
+                        className="text-[10px] flex items-center gap-1"
                       >
-                        <span className="text-muted-foreground">{s.name}</span>
-                        <span className="text-muted-foreground">
-                          {s.publishedCount} published
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                        <span
+                          className={cn(
+                            "h-1.5 w-1.5 rounded-full",
+                            status === "passed" && "bg-emerald-400",
+                            status === "in_progress" && "bg-sky-400",
+                            status === "planned" && "bg-zinc-500",
+                            status === "expired" && "bg-red-500"
+                          )}
+                        />
+                        <span>{status}</span>
+                        <span className="opacity-70">· {count}</span>
+                      </Badge>
+                    );
+                  })}
+                </div>
               </div>
             </CardContent>
           </Card>

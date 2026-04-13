@@ -180,7 +180,7 @@ export default function NewCertificationPage() {
             New certification
           </h1>
           <p className="text-sm text-muted-foreground">
-            Add a new certification entry from exams or training.
+            Add a new certification or credential entry from exams or training.
           </p>
         </div>
         <Button
@@ -197,7 +197,7 @@ export default function NewCertificationPage() {
         <CardHeader>
           <CardTitle className="text-base">Certification details</CardTitle>
           <CardDescription>
-            Track both real exam certificates and training / course completions.
+            Track exam certifications and training / course completions.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -215,12 +215,13 @@ export default function NewCertificationPage() {
             {/* Type + Status */}
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>Type</Label>
+                <Label htmlFor="new-cert-type">Type</Label>
                 <Select
+                  name="certType"
                   value={certType}
                   onValueChange={(val) => setCertType(val as CertType)}
                 >
-                  <SelectTrigger className="h-8 text-xs">
+                  <SelectTrigger id="new-cert-type" aria-label="Certification type" className="h-8 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -231,19 +232,20 @@ export default function NewCertificationPage() {
                 </Select>
                 <p className="text-[11px] text-muted-foreground">
                   Use <span className="font-medium">Exam</span> for real
-                  certification exams, and{" "}
+                  certification records, and{" "}
                   <span className="font-medium">Training</span> for courses or
                   workshops.
                 </p>
               </div>
 
               <div className="space-y-1.5">
-                <Label>Status</Label>
+                <Label htmlFor="new-cert-status">Status</Label>
                 <Select
+                  name="status"
                   value={status}
                   onValueChange={(val) => setStatus(val as CertStatus)}
                 >
-                  <SelectTrigger className="h-8 text-xs">
+                  <SelectTrigger id="new-cert-status" aria-label="Certification status" className="h-8 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -265,6 +267,8 @@ export default function NewCertificationPage() {
                 <Label htmlFor="name">Certification name</Label>
                 <Input
                   id="name"
+                  name="name"
+                  autoComplete="off"
                   placeholder="e.g. CCNP ENCOR, OCI Foundations, ISC2 CC"
                   required
                   value={name}
@@ -276,6 +280,8 @@ export default function NewCertificationPage() {
                 <Label htmlFor="vendor">Vendor / Organization</Label>
                 <Input
                   id="vendor"
+                  name="vendor"
+                  autoComplete="organization"
                   placeholder="Cisco, Oracle, ISC2, CompTIA, Microsoft..."
                   required
                   value={vendor}
@@ -287,8 +293,9 @@ export default function NewCertificationPage() {
             {/* Category + Level */}
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>Category</Label>
+                <Label htmlFor="new-cert-category">Category</Label>
                 <Select
+                  name="category"
                   value={isCustomCategory ? "_custom_" : category || "none"}
                   onValueChange={(val) => {
                     if (val === "_custom_") {
@@ -302,7 +309,7 @@ export default function NewCertificationPage() {
                   }}
                   disabled={loadingCategories}
                 >
-                  <SelectTrigger className="h-8 text-xs">
+                  <SelectTrigger id="new-cert-category" aria-label="Certification category" className="h-8 text-xs">
                     <SelectValue
                       placeholder={
                         loadingCategories
@@ -328,6 +335,8 @@ export default function NewCertificationPage() {
                 </Select>
                 {isCustomCategory && (
                   <Input
+                    id="new-cert-custom-category"
+                    name="customCategory"
                     className="mt-2 h-8 text-xs"
                     placeholder="Enter new category name..."
                     value={category}
@@ -344,6 +353,8 @@ export default function NewCertificationPage() {
                 <Label htmlFor="level">Level (optional)</Label>
                 <Input
                   id="level"
+                  name="level"
+                  autoComplete="off"
                   placeholder="Foundations, Associate, Professional, Expert..."
                   value={level}
                   onChange={(e) => setLevel(e.target.value)}
@@ -357,6 +368,7 @@ export default function NewCertificationPage() {
                 <Label htmlFor="issue">Issue date</Label>
                 <Input
                   id="issue"
+                  name="issueDate"
                   type="date"
                   value={issueDate}
                   onChange={(e) => setIssueDate(e.target.value)}
@@ -367,6 +379,7 @@ export default function NewCertificationPage() {
                 <Label htmlFor="expiry">Expiry date (optional)</Label>
                 <Input
                   id="expiry"
+                  name="expiryDate"
                   type="date"
                   value={expiryDate}
                   onChange={(e) => setExpiryDate(e.target.value)}
@@ -380,6 +393,8 @@ export default function NewCertificationPage() {
                 <Label htmlFor="credId">Credential ID (optional)</Label>
                 <Input
                   id="credId"
+                  name="credentialId"
+                  autoComplete="off"
                   placeholder="e.g. Certificate ID / Candidate ID"
                   value={credentialId}
                   onChange={(e) => setCredentialId(e.target.value)}
@@ -390,6 +405,8 @@ export default function NewCertificationPage() {
                 <Label htmlFor="credUrl">Credential URL (optional)</Label>
                 <Input
                   id="credUrl"
+                  name="credentialUrl"
+                  autoComplete="url"
                   placeholder="https://..."
                   value={credentialUrl}
                   onChange={(e) => setCredentialUrl(e.target.value)}
@@ -403,6 +420,8 @@ export default function NewCertificationPage() {
                 <Label htmlFor="score">Score (optional)</Label>
                 <Input
                   id="score"
+                  name="score"
+                  autoComplete="off"
                   placeholder="e.g. 850"
                   value={score}
                   onChange={(e) => setScore(e.target.value)}
@@ -423,7 +442,8 @@ export default function NewCertificationPage() {
             <div className="space-y-1.5">
               <Label htmlFor="notes">Notes (optional)</Label>
               <Textarea
-                id="notes"
+                  id="notes"
+                  name="notes"
                 placeholder="Any additional information..."
                 rows={3}
                 value={notes}
@@ -433,7 +453,7 @@ export default function NewCertificationPage() {
 
             {/* Badge image upload */}
             <div className="space-y-1.5">
-              <Label>Badge image (optional)</Label>
+              <Label htmlFor="new-cert-badge-image">Badge image (optional)</Label>
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-md border border-dashed border-border/60 flex items-center justify-center overflow-hidden bg-muted/30">
                   {badgePreview ? (
@@ -442,6 +462,7 @@ export default function NewCertificationPage() {
                         src={badgePreview}
                         alt="Badge preview"
                         fill
+                        sizes="64px"
                         className="object-cover"
                       />
                     </div>
@@ -454,6 +475,8 @@ export default function NewCertificationPage() {
 
                 <div className="flex flex-col gap-1">
                   <Input
+                    id="new-cert-badge-image"
+                    name="badgeImage"
                     type="file"
                     accept="image/*"
                     className="h-8"

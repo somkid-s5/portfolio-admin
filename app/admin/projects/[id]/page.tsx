@@ -218,34 +218,41 @@ export default function EditProjectPage() {
             {/* Title / Slug */}
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <Label>Title</Label>
+                <Label htmlFor="edit-project-title">Title</Label>
                 <Input
+                  id="edit-project-title"
+                  name="title"
+                  autoComplete="off"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
               </div>
               <div>
-                <Label>Slug</Label>
-                <Input value={slug} onChange={(e) => setSlug(e.target.value)} />
+                <Label htmlFor="edit-project-slug">Slug</Label>
+                <Input id="edit-project-slug" name="slug" autoComplete="off" value={slug} onChange={(e) => setSlug(e.target.value)} />
               </div>
             </div>
 
             {/* Category / status */}
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <Label>Category</Label>
+                <Label htmlFor="edit-project-category">Category</Label>
                 <Input
+                  id="edit-project-category"
+                  name="category"
+                  autoComplete="off"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 />
               </div>
               <div>
-                <Label>Status</Label>
+                <Label htmlFor="edit-project-status">Status</Label>
                 <Select
+                  name="status"
                   value={status}
                   onValueChange={(v) => setStatus(v as ProjectStatus)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="edit-project-status" aria-label="Project status">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -260,8 +267,10 @@ export default function EditProjectPage() {
 
             {/* Description */}
             <div>
-              <Label>Description</Label>
+              <Label htmlFor="edit-project-description">Description</Label>
               <Textarea
+                id="edit-project-description"
+                name="description"
                 rows={4}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -271,15 +280,20 @@ export default function EditProjectPage() {
             {/* Tech + Cover */}
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <Label>Tech Stack</Label>
+                <Label htmlFor="edit-project-tech-stack">Tech Stack</Label>
                 <Input
+                  id="edit-project-tech-stack"
+                  name="techStack"
+                  autoComplete="off"
                   value={techStack}
                   onChange={(e) => setTechStack(e.target.value)}
                 />
               </div>
               <div>
-                <Label>Cover Image</Label>
+                <Label htmlFor="edit-project-cover-image">Cover Image</Label>
                 <Input
+                  id="edit-project-cover-image"
+                  name="coverImage"
                   type="file"
                   accept="image/*"
                   onChange={(e) => {
@@ -302,6 +316,7 @@ export default function EditProjectPage() {
                       src={coverPreviewUrl}
                       alt="Cover preview"
                       fill
+                      sizes="(max-width: 768px) 100vw, 320px"
                       className="object-cover"
                     />
                   </div>
@@ -316,15 +331,21 @@ export default function EditProjectPage() {
             {/* URLs */}
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <Label>Live Demo URL</Label>
+                <Label htmlFor="edit-project-demo-url">Live Demo URL</Label>
                 <Input
+                  id="edit-project-demo-url"
+                  name="demoUrl"
+                  autoComplete="url"
                   value={demoUrl}
                   onChange={(e) => setDemoUrl(e.target.value)}
                 />
               </div>
               <div>
-                <Label>GitHub URL</Label>
+                <Label htmlFor="edit-project-github-url">GitHub URL</Label>
                 <Input
+                  id="edit-project-github-url"
+                  name="githubUrl"
+                  autoComplete="url"
                   value={githubUrl}
                   onChange={(e) => setGithubUrl(e.target.value)}
                 />
@@ -333,9 +354,12 @@ export default function EditProjectPage() {
 
             {/* Key Features */}
             <div>
-              <Label>Key Features</Label>
+              <Label htmlFor="edit-project-feature-input">Key Features</Label>
               <div className="flex gap-2 mt-1">
                 <Input
+                  id="edit-project-feature-input"
+                  name="featureInput"
+                  autoComplete="off"
                   value={featureInput}
                   onChange={(e) => setFeatureInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -416,6 +440,7 @@ export default function EditProjectPage() {
                     src={URL.createObjectURL(coverFile)}
                     alt="cover"
                     fill
+                    sizes="(max-width: 768px) 100vw, 448px"
                     className="object-cover"
                   />
                 ) : coverImageUrl ? (
@@ -423,6 +448,7 @@ export default function EditProjectPage() {
                     src={coverImageUrl}
                     alt="cover"
                     fill
+                    sizes="(max-width: 768px) 100vw, 448px"
                     className="object-cover"
                   />
                 ) : (

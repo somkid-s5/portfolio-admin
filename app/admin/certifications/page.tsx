@@ -61,7 +61,6 @@ type CertCategoryRow = {
   id: string;
   name: string;
   slug: string;
-  sort_order: number;
 };
 
 type CertRow = {
@@ -147,7 +146,21 @@ export default function CertificationsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [certToDelete, setCertToDelete] = useState<string | null>(null);
 
-  // Load certifications (categories table no longer exists)
+  const deriveCategories = (rows: CertRow[]): CertCategoryRow[] => {
+    const uniqueCategories = Array.from(
+      new Set(rows.map((row) => row.category?.trim()).filter(Boolean))
+    ) as string[];
+
+    return uniqueCategories
+      .sort((a, b) => a.localeCompare(b))
+      .map((category) => ({
+        id: category,
+        name: category,
+        slug: category.toLowerCase().replace(/\s+/g, "-"),
+      }));
+  };
+
+  // Load certifications and derive categories from current records
   useEffect(() => {
     const load = async () => {
       setLoading(true);
@@ -161,9 +174,9 @@ export default function CertificationsPage() {
           .order("issue_date", { ascending: false })
           .order("created_at", { ascending: false });
         if (certRes.error) throw new Error(certRes.error.message);
-        setCerts(certRes.data as CertRow[]);
-        setCerts(certRes.data as CertRow[]);
-        setCategories([]); // No categories table
+        const certRows = (certRes.data ?? []) as CertRow[];
+        setCerts(certRows);
+        setCategories(deriveCategories(certRows));
       } catch (e: unknown) {
         setError((e as Error).message || "Failed to load certifications.");
       } finally {
@@ -180,8 +193,7 @@ export default function CertificationsPage() {
   }, [certs]);
 
   const usedCategories = useMemo(() => {
-    const usedIds = new Set(certs.map((c) => c.category).filter(Boolean));
-    return categories.filter((c) => usedIds.has(c.id));
+    return categories;
   }, [certs, categories]);
 
   const filteredCerts = useMemo(() => {
@@ -272,7 +284,7 @@ export default function CertificationsPage() {
             Certifications
           </h1>
           <p className="text-sm text-muted-foreground">
-            Track your exams and training certificates in one place.
+            Track your exams, training certifications, and credentials in one place.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -300,7 +312,7 @@ export default function CertificationsPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <CardTitle className="text-base flex items-center gap-2">
-                <Trophy className="h-4 w-4 text-primary" /> Certification
+                <Trophy className="h-4 w-4 text-primary" /> Certifications
                 overview
               </CardTitle>
               <CardDescription>
@@ -398,6 +410,10 @@ export default function CertificationsPage() {
               <div className="w-full md:w-60 ">
                 <Input
                   placeholder="Search name, vendor, level…"
+                  id="certifications-admin-search"
+                  name="certifications-admin-search"
+                  aria-label="Search certifications by name, vendor, or level"
+                  autoComplete="off"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="h-8 text-xs"
@@ -521,7 +537,7 @@ export default function CertificationsPage() {
                         </TableCell>
                         <TableCell className="text-sm">{cert.vendor}</TableCell>
                         <TableCell className="text-sm">
-                          {getCategoryName(cert.category)}
+                          {cert.category || "-"}
                         </TableCell>
                         <TableCell className="text-xs">
                           <Badge
