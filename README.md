@@ -1,6 +1,6 @@
 # ⚡ Portfolio Admin Panel
 
-![Project Banner](https://via.placeholder.com/1200x400?text=Portfolio+Admin+Panel+Banner)
+![Project Banner](admin-dashboard.png/1200x400?text=Portfolio+Admin+Panel+Banner)
 
 <div align="center">
 
